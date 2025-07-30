@@ -9,6 +9,8 @@
 	import Input from './ui/input/input.svelte';
 	import SidebarMenuAction from './ui/sidebar/sidebar-menu-action.svelte';
 	import { currentLog, fileTree } from '$lib/store';
+	import { Trash2 } from '@lucide/svelte';
+
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 
@@ -40,9 +42,8 @@
 		currentLog.set(arr);
 	}
 
-	function deleteYear(targetYear) {
-		fileTree.update((current) => current.filter((entry) => entry[0] !== targetYear));
-	}
+
+
 </script>
 
 <Sidebar.Root bind:ref {...restProps}>
