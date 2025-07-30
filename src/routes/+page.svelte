@@ -6,11 +6,32 @@
 	import SvelteMarkdown from 'svelte-marked';
 
 	let something = $state('');
+
 	$effect(() => {
-		filesList.update((currentFilesList) => {
-			
-		})
+		if ($currentLog.length > 0) {
+			let currentFile = `${$currentLog[1]}_${$currentLog[2]}_${$currentLog[3]}_${$currentLog[0]}`;
+			if ($filesList[currentFile]) {
+				something = $filesList[currentFile].content;
+			} else {
+				something = '';
+			}
+		}
 	});
+	function handleInput() {
+		if ($currentLog.length > 0) {
+			let currentFile = `${$currentLog[1]}_${$currentLog[2]}_${$currentLog[3]}_${$currentLog[0]}`;
+			filesList.update((currentFilesList) => {
+				if (!currentFilesList[currentFile]) {
+					currentFilesList[currentFile] = {
+						content: something
+					};
+				} else {
+					currentFilesList[currentFile].content = something;
+				}
+				return currentFilesList;
+			});
+		}
+	}
 </script>
 
 {#if $currentLog.length > 0}
@@ -18,7 +39,7 @@
 		{#if $shouldPreview == true}
 			{@html marked(something)}
 		{:else}
-			<InputBox bind:value={something} />
+			<InputBox {handleInput} bind:value={something} />
 		{/if}
 	</div>
 {/if}

@@ -7,7 +7,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
-	import { fileTree, currentLog, shouldPreview } from '$lib/store';
+	import { fileTree, currentLog, shouldPreview, filesList } from '$lib/store';
 
 	import { Eye, PenLine, Trash2 } from '@lucide/svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
@@ -85,8 +85,15 @@
 		});
 	}
 	function deleteLog(targetYear, targetMonth, targetDay, targetTime) {
+		let currentFile = `${$currentLog[1]}_${$currentLog[2]}_${$currentLog[3]}_${$currentLog[0]}`;
 		currentLog.set([]);
 		const targetFullTime = `${targetTime}_${targetYear}_${targetMonth}_${targetDay}`;
+
+
+		filesList.update((currentFilesList) => {
+			delete currentFilesList[currentFile];
+			return currentFilesList;
+		});
 
 		fileTree.update((current) => {
 			return current.map((yearEntry) => {
@@ -131,7 +138,7 @@
 	<AppSidebar />
 	<Sidebar.Inset>
 		<header class="flex h-12 w-full shrink-0 items-center gap-2 border-b px-4">
-			<Sidebar.Trigger class="-ml-1 text-primary" />
+			<Sidebar.Trigger class="text-primary -ml-1" />
 			<Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
 			<Breadcrumb.Root>
 				<Breadcrumb.List>
@@ -154,13 +161,12 @@
 							{$currentLog[0]}
 						</Breadcrumb.Item>
 					{/if}
-								</Breadcrumb.List>
-								
+				</Breadcrumb.List>
 			</Breadcrumb.Root>
 			{#if $shouldPreview == true}
-			<Badge>Preview Mode</Badge>
+				<Badge>Preview Mode</Badge>
 			{:else}
-			<Badge>Write Mode</Badge>
+				<Badge>Write Mode</Badge>
 			{/if}
 			<div class="ml-auto flex gap-1">
 				<Button onclick={addLog}>Log</Button>
@@ -180,7 +186,6 @@
 										class="text-destructive">unrecoverable</span
 									>
 								</AlertDialog.Description>
-
 							</AlertDialog.Header>
 							<AlertDialog.Footer>
 								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
