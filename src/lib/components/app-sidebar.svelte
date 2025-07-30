@@ -11,7 +11,6 @@
 	import { currentLog, fileTree } from '$lib/store';
 	import { Trash2 } from '@lucide/svelte';
 
-
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 
 	let data = $state({
@@ -41,9 +40,6 @@
 		let day = arr[3];
 		currentLog.set(arr);
 	}
-
-
-
 </script>
 
 <Sidebar.Root bind:ref {...restProps}>
@@ -81,15 +77,17 @@
 <!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
 {#snippet Tree({ item }: { item: string | any[] })}
 	{@const [name, ...items] = Array.isArray(item) ? item : [item]}
-	{#if !items.length}
+	{#if !Array.isArray(item)}
+		<!-- Primitive value, like a file -->
 		<Sidebar.MenuButton
-			onclick={() => handleMenuItemClicked(name.split('_').filter(Boolean))}
+			onclick={() => handleMenuItemClicked(item.split('_').filter(Boolean))}
 			class="data-[active=true]:bg-transparent"
 		>
 			<FileIcon />
-			{name.split('_').filter(Boolean)[0]}
+			{item.split('_').filter(Boolean)[0]}
 		</Sidebar.MenuButton>
-	{:else}
+	{:else if Array.isArray(item) && typeof name === 'string'}
+		<!-- Always treat arrays as folders -->
 		<Sidebar.MenuItem>
 			<Collapsible.Root
 				class="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
