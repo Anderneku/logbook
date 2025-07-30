@@ -7,16 +7,19 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
-	import { fileTree, currentLog } from '$lib/store';
+	import { fileTree, currentLog, shouldPreview } from '$lib/store';
 
 	import { Eye, PenLine, Trash2 } from '@lucide/svelte';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
+	import { ModeWatcher, setMode } from 'mode-watcher';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	let { children } = $props();
 
 	let nowRaw: Date;
 	onMount(() => {
+		setMode('dark');
 		nowRaw = new Date();
 		currentLog.set([]);
 	});
@@ -123,41 +126,46 @@
 	}
 </script>
 
+<ModeWatcher />
 <Sidebar.Provider>
 	<AppSidebar />
 	<Sidebar.Inset>
 		<header class="flex h-12 w-full shrink-0 items-center gap-2 border-b px-4">
-			<Sidebar.Trigger class="-ml-1" />
+			<Sidebar.Trigger class="-ml-1 text-primary" />
 			<Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
 			<Breadcrumb.Root>
 				<Breadcrumb.List>
 					{#if $currentLog.length < 1}
-						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#">No Log Selected</Breadcrumb.Link>
-						</Breadcrumb.Item>
+						<Breadcrumb.Item class="hidden md:block">No Log Selected</Breadcrumb.Item>
 					{:else}
 						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#">{$currentLog[1]}</Breadcrumb.Link>
+							{$currentLog[1]}
 						</Breadcrumb.Item>
 						<Breadcrumb.Separator class="hidden md:block" />
 						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#">{$currentLog[2]}</Breadcrumb.Link>
+							{$currentLog[2]}
 						</Breadcrumb.Item>
 						<Breadcrumb.Separator class="hidden md:block" />
 						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#">{$currentLog[3]}</Breadcrumb.Link>
+							{$currentLog[3]}
 						</Breadcrumb.Item>
 						<Breadcrumb.Separator class="hidden md:block" />
 						<Breadcrumb.Item class="hidden md:block">
-							<Breadcrumb.Link href="#">{$currentLog[0]}</Breadcrumb.Link>
+							{$currentLog[0]}
 						</Breadcrumb.Item>
 					{/if}
-				</Breadcrumb.List>
+								</Breadcrumb.List>
+								
 			</Breadcrumb.Root>
+			{#if $shouldPreview == true}
+			<Badge>Preview Mode</Badge>
+			{:else}
+			<Badge>Write Mode</Badge>
+			{/if}
 			<div class="ml-auto flex gap-1">
 				<Button onclick={addLog}>Log</Button>
-				<Button><PenLine /></Button>
-				<Button><Eye /></Button>
+				<Button onclick={() => shouldPreview.set(false)}><PenLine /></Button>
+				<Button onclick={() => shouldPreview.set(true)}><Eye /></Button>
 
 				{#if disableDelete == true}
 					<AlertDialog.Root>
@@ -172,6 +180,7 @@
 										class="text-destructive">unrecoverable</span
 									>
 								</AlertDialog.Description>
+
 							</AlertDialog.Header>
 							<AlertDialog.Footer>
 								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>

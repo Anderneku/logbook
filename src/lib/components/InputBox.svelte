@@ -1,8 +1,8 @@
 <script>
-	let { value } = $props();
+	let { value = $bindable() } = $props();
 </script>
 
-<textarea bind:value class="h-full w-full outline-0 p-4 font-mono"></textarea>
+<textarea bind:value class="h-full w-full outline-0 font-mono"></textarea>
 
 <style>
 	textarea {
