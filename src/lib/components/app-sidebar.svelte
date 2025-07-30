@@ -1,79 +1,70 @@
-<script lang="ts" module>
-	// This is sample data.
-	const data = {
-		changes: [
-			{
-				file: "README.md",
-				state: "M",
-			},
-			{
-				file: "routes/+page.svelte",
-				state: "U",
-			},
-			{
-				file: "routes/+layout.svelte",
-				state: "M",
-			},
-		],
-		tree: [
-			["lib", ["components", "button.svelte", "card.svelte"], "utils.ts"],
-			[
-				"routes",
-				["hello", "+page.svelte", "+page.ts"],
-				"+page.svelte",
-				"+page.server.ts",
-				"+layout.svelte",
-			],
-			["static", "favicon.ico", "svelte.svg",],
-			"eslint.config.js",
-			".gitignore",
-			"svelte.config.js",
-			"tailwind.config.js",
-			"package.json",
-			"README.md",
-			["new", "day01"]
-		],
-	};
-</script>
-
 <script lang="ts">
-	import * as Collapsible from "$lib/components/ui/collapsible/index.js";
-	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-	import FileIcon from "@lucide/svelte/icons/file";
-	import FolderIcon from "@lucide/svelte/icons/folder";
-	import type { ComponentProps } from "svelte";
-	import { Button } from "./ui/button";
-	import Input from "./ui/input/input.svelte";
-	import SidebarMenuAction from "./ui/sidebar/sidebar-menu-action.svelte";
+	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
+	import FileIcon from '@lucide/svelte/icons/file';
+	import FolderIcon from '@lucide/svelte/icons/folder';
+	import type { ComponentProps } from 'svelte';
+	import { Button } from './ui/button';
+	import Input from './ui/input/input.svelte';
+	import SidebarMenuAction from './ui/sidebar/sidebar-menu-action.svelte';
+	import { currentLog, fileTree } from '$lib/store';
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+
+	let data = $state({
+		changes: [
+			{
+				file: 'README.md',
+				state: 'M'
+			},
+			{
+				file: 'routes/+page.svelte',
+				state: 'U'
+			},
+			{
+				file: 'routes/+layout.svelte',
+				state: 'M'
+			}
+		],
+		tree: $fileTree
+	});
+	$effect(() => {
+		data.tree = $fileTree;
+	});
+
+	function handleMenuItemClicked(arr) {
+		let year = arr[1];
+		let month = arr[2];
+		let day = arr[3];
+		currentLog.set(arr);
+	}
+
+	function deleteYear(targetYear) {
+		fileTree.update((current) => current.filter((entry) => entry[0] !== targetYear));
+	}
 </script>
 
 <Sidebar.Root bind:ref {...restProps}>
-	<Sidebar.Content>
-		<Sidebar.Group>
+	<Sidebar.Content class="overflow-x-hidden">
+		<!-- <Sidebar.Group>
 			<Sidebar.GroupAction>d</Sidebar.GroupAction>
 			<Sidebar.GroupLabel>Changes</Sidebar.GroupLabel>
 			<Sidebar.GroupContent>
 				<Sidebar.Menu>
 					{#each data.changes as item, index (index)}
 						<Sidebar.MenuItem class="flex">
-							
 							<Sidebar.MenuButton>
 								<FileIcon />
-							{item.file}
+								{item.file}
 							</Sidebar.MenuButton>
-							<!-- <Button class="w-8 h-8 rounded-full" onclick={()=>console.log("Something")}>d</Button> -->
-							<!-- <Button class="w-8 h-8 rounded-full" onclick={()=>console.log("Something")}>d</Button> -->
-							<!-- <Sidebar.MenuBadge>{item.state}</Sidebar.MenuBadge> -->
 						</Sidebar.MenuItem>
 					{/each}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
-		</Sidebar.Group>
+		</Sidebar.Group> -->
 		<Sidebar.Group>
-			<Sidebar.GroupLabel>Files</Sidebar.GroupLabel>
+			<Sidebar.GroupLabel>Logs</Sidebar.GroupLabel>
 			<Sidebar.GroupContent>
 				<Sidebar.Menu>
 					{#each data.tree as item, index (index)}
@@ -91,23 +82,19 @@
 	{@const [name, ...items] = Array.isArray(item) ? item : [item]}
 	{#if !items.length}
 		<Sidebar.MenuButton
-			isActive={name === "button.svelte"}
+			onclick={() => handleMenuItemClicked(name.split('_').filter(Boolean))}
 			class="data-[active=true]:bg-transparent"
 		>
 			<FileIcon />
-			{name}
+			{name.split('_').filter(Boolean)[0]}
 		</Sidebar.MenuButton>
 	{:else}
 		<Sidebar.MenuItem>
 			<Collapsible.Root
 				class="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
-				open={name === "lib" || name === "components"}
 			>
 				<Collapsible.Trigger>
 					{#snippet child({ props })}
-					<SidebarMenuAction onclick={() => console.log(name)} showOnHover>
-								+
-							</SidebarMenuAction>
 						<Sidebar.MenuButton {...props}>
 							<ChevronRightIcon className="transition-transform" />
 							<FolderIcon />
@@ -116,7 +103,7 @@
 					{/snippet}
 				</Collapsible.Trigger>
 				<Collapsible.Content>
-					<Sidebar.MenuSub>
+					<Sidebar.MenuSub class="w-full">
 						{#each items as subItem, index (index)}
 							{@render Tree({ item: subItem })}
 						{/each}
