@@ -1,38 +1,48 @@
-# sv
+# 📝 Markdown LogBook with File System – SvelteKit
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+<img width="1902" height="891" alt="image" src="https://github.com/user-attachments/assets/6dcae601-0fbe-4c86-8686-394b50865d97" />
 
-## Creating a project
 
-If you're seeing this, you've probably already done this step. Congrats!
+A lightweight Markdown LogBook editor built with **SvelteKit**, featuring a built-in file system for managing multiple markdown files locally. All edits are instant and persistent during the session.
 
-```bash
-# create a new project in the current directory
-npx sv create
 
-# create a new project in my-app
-npx sv create my-app
-```
+No adding/naming files needed. Just Log and it gets the timestap sorted automatically in the correct folder
 
-## Developing
+---
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## ✨ Features
 
-```bash
-npm run dev
+- 📁 **Multi-file support**  
+  Create, select, and delete markdown files using a simple local file system.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- 🖊️ **Live Editing**  
+  Changes are immediately reflected in the editor as you type.
 
-## Building
+- 🔁 **Reactive Data Binding**  
+  Powered by Svelte stores, ensuring seamless sync between UI and state.
 
-To create a production version of your app:
+- 🧠 **Persistent File State**  
+  Content is stored in-memory using a `Map` structure like:  
+  ```ts
+  {
+    "2025-07-29": { content: "# Hello World" },
+    "2025-07-30": { content: "## Another File" }
+  }
+  ```
+  And a file tree structure like this:
+  ```ts
+  [["2025",["July",["30","15:05:10_2025_July_30","15:05:14_2025_July_30"]]]]
+  ```
+  You get the idea
 
-```bash
-npm run build
-```
+### 📋 Feature Comparison
 
-You can preview the production build with `npm run preview`.
+| Feature            | Supported | Notes                          |
+|--------------------|-----------|--------------------------------|
+| Multiple Files     | ✅        | Manage separate markdown docs  |
+| Live Editing       | ✅        | Updates content in real time   |
+| Markdown Preview   | ✅        | Coming in next version         |
+| Dark Mode          | ✅        | Respects system theme          |
+| File Export        | ❌        | Planned for future release     |
+| Theme Switching    | ❌        | Planned for future release     |
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
